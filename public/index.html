@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bika MCP Server</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    h1 { color: #333; }
+    code {
+      background: #f4f4f4;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 14px;
+    }
+    pre {
+      background: #f4f4f4;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+    .endpoint {
+      background: #e8f4f8;
+      padding: 10px;
+      margin: 10px 0;
+      border-left: 4px solid #0066cc;
+    }
+    a {
+      color: #0066cc;
+    }
+    ul {
+      line-height: 1.8;
+    }
+    .notice {
+      background: #fff3cd;
+      border: 2px solid #ffc107;
+      border-radius: 5px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    .notice strong {
+      color: #856404;
+      font-size: 18px;
+    }
+    .notice a {
+      color: #0066cc;
+      font-weight: 600;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h1>Bika MCP Server on Vercel</h1>
+
+  <div class="notice">
+    <strong>🎉 Your Bika MCP Server is Live!</strong>
+    <p>You've successfully deployed your personal MCP server for connecting to your Bika.ai account.</p>
+    <p><strong>⚠️ CRITICAL SECURITY WARNING:</strong></p>
+    <ul style="text-align: left; margin: 10px auto; max-width: 600px;">
+      <li><strong>Keep this URL private</strong> - Anyone with it can access your entire Bika account</li>
+      <li><strong>Never share publicly</strong> - Treat this URL like a password</li>
+      <li><strong>Keep your GitHub repo private</strong> - Don't expose your deployment</li>
+      <li>Your Bika API token is stored securely in Vercel environment variables</li>
+    </ul>
+    <p><strong>Want to help others?</strong></p>
+    <p><a href="https://github.com/hamchowderr/bika-mcp" target="_blank">📦 Share the GitHub Repo →</a></p>
+    <p style="font-size: 0.9em; color: #666;">Share the repository so others can deploy their own instance - never share YOUR deployment URL!</p>
+  </div>
+
+  <p>This is your personal Model Context Protocol (MCP) server providing programmatic access to your Bika.ai databases, records, automations, and more.</p>
+
+  <h2>MCP Protocol Endpoints</h2>
+
+  <div class="endpoint">
+    <strong>Streamable HTTP Transport (Primary):</strong><br>
+    <code>/mcp</code>
+  </div>
+
+  <div class="endpoint">
+    <strong>SSE Transport (Alternative):</strong><br>
+    <code>/sse</code>
+  </div>
+
+  <h2>Connect to Claude Desktop</h2>
+
+  <p><strong>To use your MCP server:</strong></p>
+  <ol style="text-align: left; max-width: 600px; margin: 20px auto;">
+    <li>Open <strong>Claude Desktop</strong></li>
+    <li>Go to <strong>Settings → Connectors</strong></li>
+    <li>Click <strong>Add Custom Connector</strong></li>
+    <li>Enter your URL with <code>/mcp</code> at the end</li>
+  </ol>
+
+  <p style="background: #fff3cd; padding: 15px; border-radius: 5px; border-left: 4px solid #ffc107; max-width: 600px; margin: 20px auto;">
+    <strong>⚠️ Remember:</strong> Add <code>/mcp</code> to the end of this page's URL when configuring Claude Desktop!
+  </p>
+
+  <h2>Available Tools (22+)</h2>
+
+  <p>This server provides comprehensive Bika.ai integration tools:</p>
+
+  <h3>System Tools</h3>
+  <ul>
+    <li><code>bika_get_system_meta</code> - Get system metadata and version information</li>
+    <li><code>bika_list_spaces</code> - List all accessible Bika spaces</li>
+  </ul>
+
+  <h3>Database Tools</h3>
+  <ul>
+    <li><code>bika_get_database</code> - Get database metadata, schema, and configuration</li>
+    <li><code>bika_get_database_fields</code> - Get field definitions and schemas</li>
+    <li><code>bika_get_database_views</code> - Get all views from a database</li>
+    <li><code>bika_get_records_v1</code> - Query records with filtering (v1 API)</li>
+    <li><code>bika_list_records_v2</code> - Advanced record queries with pagination, sorting (v2 API)</li>
+    <li><code>bika_get_record_v2</code> - Get a single record with formatting options (v2 API)</li>
+    <li><code>bika_create_record_v1</code> - Create a new record (v1 API)</li>
+    <li><code>bika_update_record_v1</code> - Update an existing record (v1 API)</li>
+    <li><code>bika_update_record_v2</code> - Update a record with field key formatting (v2 API)</li>
+    <li><code>bika_delete_record_v1</code> - Delete a record (v1 API)</li>
+    <li><code>bika_delete_record_v2</code> - Delete a record (v2 API)</li>
+    <li><code>bika_batch_create_records_v2</code> - Batch create up to 10 records (v2 API)</li>
+    <li><code>bika_batch_update_records_v2</code> - Batch update up to 10 records (v2 API)</li>
+    <li><code>bika_batch_delete_records_v2</code> - Batch delete up to 10 records (v2 API)</li>
+  </ul>
+
+  <h3>Node Tools</h3>
+  <ul>
+    <li><code>bika_get_node</code> - Get information about a specific node (database, folder, etc.)</li>
+    <li><code>bika_list_nodes</code> - List all nodes in a space</li>
+  </ul>
+
+  <h3>User Tools</h3>
+  <ul>
+    <li><code>bika_get_user_profile</code> - Get current user profile information</li>
+  </ul>
+
+  <h3>Webhook Tools</h3>
+  <ul>
+    <li><code>bika_list_outgoing_webhooks</code> - List all outgoing webhooks</li>
+    <li><code>bika_create_outgoing_webhook</code> - Create a new outgoing webhook</li>
+    <li><code>bika_delete_outgoing_webhook</code> - Delete an outgoing webhook</li>
+  </ul>
+
+  <h2>Resources</h2>
+
+  <p>Comprehensive documentation available as MCP resources:</p>
+  <ul>
+    <li><strong>API Documentation:</strong> Basic concepts, authentication, endpoints, examples</li>
+    <li><strong>Field Types:</strong> Complete reference for all 23+ field types (Text, Number, Date, Link, Formula, etc.)</li>
+    <li><strong>Filter Query Language:</strong> Syntax, operators, field queries, best practices</li>
+    <li><strong>Formula Functions:</strong> Numeric, text, logical, date/time, array, and aggregate functions</li>
+    <li><strong>Metadata:</strong> Node types, view types, and system information</li>
+  </ul>
+
+  <h2>More Information</h2>
+
+  <p>
+    <a href="https://github.com/modelcontextprotocol">Model Context Protocol</a> |
+    <a href="https://bika.ai/developers">Bika API Documentation</a> |
+    <a href="https://github.com/hamchowderr/bika-mcp">GitHub Repository</a>
+  </p>
+
+  <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; color: #666; font-size: 14px;">
+    Built on top of <a href="https://github.com/hamchowderr/vercel-mcp-template">Vercel MCP Template</a>
+  </p>
+</body>
+</html>
