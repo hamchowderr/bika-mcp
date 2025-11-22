@@ -771,37 +771,4 @@ const handler = createMcpHandler((server) => {
   );
 });
 
-// CORS headers for Claude Desktop custom connector support
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Authorization, Content-Type",
-};
-
-// CORS wrapper for custom connector support
-const corsHandler = async (req: Request): Promise<Response> => {
-  // Handle CORS preflight
-  if (req.method === "OPTIONS") {
-    return new Response(null, {
-      status: 204,
-      headers: corsHeaders,
-    });
-  }
-
-  // Pass to MCP handler and add CORS headers to response
-  const response = await handler(req);
-
-  // Clone response and add CORS headers
-  const newHeaders = new Headers(response.headers);
-  Object.entries(corsHeaders).forEach(([key, value]) => {
-    newHeaders.set(key, value);
-  });
-
-  return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers: newHeaders,
-  });
-};
-
-export { corsHandler as GET, corsHandler as POST, corsHandler as DELETE, corsHandler as OPTIONS };
+export { handler as GET, handler as POST, handler as DELETE };
