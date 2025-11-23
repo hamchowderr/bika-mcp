@@ -1,0 +1,24 @@
+{
+  "name": "bika-mcp",
+  "version": "0.1.0",
+  "description": "Model Context Protocol server for Bika.ai",
+  "type": "module",
+  "scripts": {
+    "dev:vercel": "vercel dev"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "bika",
+    "bika.ai"
+  ],
+  "author": "hamchowderr",
+  "license": "MIT",
+  "dependencies": {
+    "mcp-handler": "^1.0.1",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10"
+  }
+}
