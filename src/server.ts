@@ -24,6 +24,10 @@ import * as WebhookHandlers from './tools/webhooks.js';
 // Import resources
 import * as Resources from './resources/index.js';
 
+// Import MCP Apps Extension views
+import { VIEW_URIS, recordsTableHtml, recordDetailHtml, databaseSchemaHtml } from './views/index.js';
+import { RESOURCE_MIME_TYPE } from '@modelcontextprotocol/ext-apps/server';
+
 // Import Zod schemas for validation
 import * as Schemas from './schemas.js';
 
@@ -330,19 +334,48 @@ export function createBikaServer(config: BikaConfig): Server {
   });
 
   /**
-   * List available resources
+   * MCP Apps Extension - UI resource map
+   */
+  const uiResources: Record<string, { name: string; html: string }> = {
+    [VIEW_URIS.recordsTable]: { name: 'Records Table', html: recordsTableHtml },
+    [VIEW_URIS.recordDetail]: { name: 'Record Detail', html: recordDetailHtml },
+    [VIEW_URIS.databaseSchema]: { name: 'Database Schema', html: databaseSchemaHtml },
+  };
+
+  /**
+   * List available resources (includes both data resources and UI app resources)
    */
   server.setRequestHandler(ListResourcesRequestSchema, async () => {
+    const dataResources = Resources.getAllResources();
+    const appResources = Object.entries(uiResources).map(([uri, { name }]) => ({
+      uri,
+      name,
+      mimeType: RESOURCE_MIME_TYPE,
+    }));
     return {
-      resources: Resources.getAllResources(),
+      resources: [...dataResources, ...appResources],
     };
   });
 
   /**
-   * Read a specific resource
+   * Read a specific resource (handles both data and UI app resources)
    */
   server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
     const { uri } = request.params;
+
+    // Handle UI app resources
+    const uiResource = uiResources[uri];
+    if (uiResource) {
+      return {
+        contents: [{
+          uri,
+          mimeType: RESOURCE_MIME_TYPE,
+          text: uiResource.html,
+        }],
+      };
+    }
+
+    // Handle standard data resources
     return Resources.readResource(uri);
   });
 

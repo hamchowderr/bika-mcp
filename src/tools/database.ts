@@ -20,6 +20,7 @@ import {
   UpdateRecordsSchema,
   DeleteRecordsSchema,
 } from '../schemas.js';
+import { VIEW_URIS } from '../views/index.js';
 
 /**
  * Database tool definitions
@@ -32,8 +33,9 @@ export const databaseTools: Tool[] = [
   },
   {
     name: 'bika_get_database_fields',
-    description: 'Get field definitions and schemas for a specific database',
+    description: 'Get field definitions and schemas for a specific database. Displays an interactive schema viewer when UI is available.',
     inputSchema: zodToJsonSchema(GetDatabaseFieldsSchema, { target: 'jsonSchema7' }) as any,
+    _meta: { ui: { resourceUri: VIEW_URIS.databaseSchema } },
   },
   {
     name: 'bika_get_database_views',
@@ -47,13 +49,15 @@ export const databaseTools: Tool[] = [
   },
   {
     name: 'bika_list_records_v2',
-    description: 'List records from a Bika database with advanced filtering, sorting, pagination, and field selection (v2 API)',
+    description: 'List records from a Bika database with advanced filtering, sorting, pagination, and field selection (v2 API). Displays an interactive table when UI is available.',
     inputSchema: zodToJsonSchema(ListRecordsSchema, { target: 'jsonSchema7' }) as any,
+    _meta: { ui: { resourceUri: VIEW_URIS.recordsTable } },
   },
   {
     name: 'bika_get_record_v2',
-    description: 'Get a single record from a Bika database with optional formatting options (v2 API)',
+    description: 'Get a single record from a Bika database with optional formatting options (v2 API). Displays an interactive detail card when UI is available.',
     inputSchema: zodToJsonSchema(GetRecordSchema, { target: 'jsonSchema7' }) as any,
+    _meta: { ui: { resourceUri: VIEW_URIS.recordDetail } },
   },
   {
     name: 'bika_create_record_v1',

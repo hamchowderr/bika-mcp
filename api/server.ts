@@ -9,6 +9,8 @@
 
 import { createMcpHandler } from "mcp-handler";
 import { z } from "zod";
+import { registerAppTool, registerAppResource, RESOURCE_MIME_TYPE } from "@modelcontextprotocol/ext-apps/server";
+import { VIEW_URIS, recordsTableHtml, recordDetailHtml, databaseSchemaHtml } from "../src/views/index.js";
 
 // Load config from environment variables
 const config = {
@@ -87,14 +89,18 @@ const handler = createMcpHandler((server) => {
     }
   );
 
-  server.tool(
+  registerAppTool(
+    server,
     "bika_get_database_fields",
-    "Get field definitions and schemas for a specific database",
     {
-      spaceId: z.string().optional(),
-      databaseId: z.string(),
+      description: "Get field definitions and schemas for a specific database. Displays an interactive schema viewer when UI is available.",
+      inputSchema: {
+        spaceId: z.string().optional(),
+        databaseId: z.string(),
+      },
+      _meta: { ui: { resourceUri: VIEW_URIS.databaseSchema } },
     },
-    async ({ spaceId, databaseId }) => {
+    async ({ spaceId, databaseId }: { spaceId?: string; databaseId: string }) => {
       const space = spaceId || config.defaultSpaceId;
       if (!space) throw new Error("spaceId is required (or set BIKA_SPACE_ID)");
 
@@ -150,24 +156,28 @@ const handler = createMcpHandler((server) => {
     }
   );
 
-  server.tool(
+  registerAppTool(
+    server,
     "bika_list_records_v2",
-    "List records from a Bika database with advanced filtering, sorting, pagination, and field selection (v2 API)",
     {
-      spaceId: z.string().optional(),
-      databaseId: z.string(),
-      filter: z.string().optional(),
-      offset: z.string().optional(),
-      pageSize: z.number().optional(),
-      maxRecords: z.number().optional(),
-      fields: z.array(z.string()).optional(),
-      sort: z.array(z.object({ field: z.string(), order: z.enum(["asc", "desc"]) })).optional(),
-      timeZone: z.string().optional(),
-      userLocale: z.enum(["en", "zh-CN", "zh-TW", "ja", "pt", "de"]).optional(),
-      cellFormat: z.enum(["json", "string"]).optional(),
-      fieldKey: z.enum(["name", "id"]).optional(),
+      description: "List records from a Bika database with advanced filtering, sorting, pagination, and field selection (v2 API). Displays an interactive table when UI is available.",
+      inputSchema: {
+        spaceId: z.string().optional(),
+        databaseId: z.string(),
+        filter: z.string().optional(),
+        offset: z.string().optional(),
+        pageSize: z.number().optional(),
+        maxRecords: z.number().optional(),
+        fields: z.array(z.string()).optional(),
+        sort: z.array(z.object({ field: z.string(), order: z.enum(["asc", "desc"]) })).optional(),
+        timeZone: z.string().optional(),
+        userLocale: z.enum(["en", "zh-CN", "zh-TW", "ja", "pt", "de"]).optional(),
+        cellFormat: z.enum(["json", "string"]).optional(),
+        fieldKey: z.enum(["name", "id"]).optional(),
+      },
+      _meta: { ui: { resourceUri: VIEW_URIS.recordsTable } },
     },
-    async ({ spaceId, databaseId, filter, offset, pageSize, maxRecords, fields, sort, timeZone, userLocale, cellFormat, fieldKey }) => {
+    async ({ spaceId, databaseId, filter, offset, pageSize, maxRecords, fields, sort, timeZone, userLocale, cellFormat, fieldKey }: { spaceId?: string; databaseId: string; filter?: string; offset?: string; pageSize?: number; maxRecords?: number; fields?: string[]; sort?: { field: string; order: "asc" | "desc" }[]; timeZone?: string; userLocale?: string; cellFormat?: string; fieldKey?: string }) => {
       const space = spaceId || config.defaultSpaceId;
       if (!space) throw new Error("spaceId is required (or set BIKA_SPACE_ID)");
 
@@ -192,19 +202,23 @@ const handler = createMcpHandler((server) => {
     }
   );
 
-  server.tool(
+  registerAppTool(
+    server,
     "bika_get_record_v2",
-    "Get a single record from a Bika database with optional formatting options (v2 API)",
     {
-      spaceId: z.string().optional(),
-      databaseId: z.string(),
-      recordId: z.string(),
-      timeZone: z.string().optional(),
-      userLocale: z.enum(["en", "zh-CN", "zh-TW", "ja", "pt", "de"]).optional(),
-      cellFormat: z.enum(["json", "string"]).optional(),
-      fieldKey: z.enum(["name", "id"]).optional(),
+      description: "Get a single record from a Bika database with optional formatting options (v2 API). Displays an interactive detail card when UI is available.",
+      inputSchema: {
+        spaceId: z.string().optional(),
+        databaseId: z.string(),
+        recordId: z.string(),
+        timeZone: z.string().optional(),
+        userLocale: z.enum(["en", "zh-CN", "zh-TW", "ja", "pt", "de"]).optional(),
+        cellFormat: z.enum(["json", "string"]).optional(),
+        fieldKey: z.enum(["name", "id"]).optional(),
+      },
+      _meta: { ui: { resourceUri: VIEW_URIS.recordDetail } },
     },
-    async ({ spaceId, databaseId, recordId, timeZone, userLocale, cellFormat, fieldKey }) => {
+    async ({ spaceId, databaseId, recordId, timeZone, userLocale, cellFormat, fieldKey }: { spaceId?: string; databaseId: string; recordId: string; timeZone?: string; userLocale?: string; cellFormat?: string; fieldKey?: string }) => {
       const space = spaceId || config.defaultSpaceId;
       if (!space) throw new Error("spaceId is required (or set BIKA_SPACE_ID)");
 
@@ -530,6 +544,50 @@ const handler = createMcpHandler((server) => {
         content: [{ type: "text", text: JSON.stringify(data, null, 2) }],
       };
     }
+  );
+
+  // ===== MCP Apps Extension - UI Resources =====
+
+  registerAppResource(
+    server,
+    "Records Table",
+    VIEW_URIS.recordsTable,
+    { description: "Interactive sortable and filterable table view for Bika database records" },
+    async () => ({
+      contents: [{
+        uri: VIEW_URIS.recordsTable,
+        mimeType: RESOURCE_MIME_TYPE,
+        text: recordsTableHtml,
+      }],
+    })
+  );
+
+  registerAppResource(
+    server,
+    "Record Detail",
+    VIEW_URIS.recordDetail,
+    { description: "Card-style detail view for a single Bika database record" },
+    async () => ({
+      contents: [{
+        uri: VIEW_URIS.recordDetail,
+        mimeType: RESOURCE_MIME_TYPE,
+        text: recordDetailHtml,
+      }],
+    })
+  );
+
+  registerAppResource(
+    server,
+    "Database Schema",
+    VIEW_URIS.databaseSchema,
+    { description: "Visual schema viewer for Bika database field definitions" },
+    async () => ({
+      contents: [{
+        uri: VIEW_URIS.databaseSchema,
+        mimeType: RESOURCE_MIME_TYPE,
+        text: databaseSchemaHtml,
+      }],
+    })
   );
 
 });
